@@ -6,7 +6,7 @@ from functions.logger import log
 def write_to_csv(title, data):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     project_root = Path(__file__).parent.parent.parent
-    csv_filename = project_root / "non_imported_reports" / f"{title}_{timestamp}.csv"
+    csv_filename = project_root / "logs" / f"{title}_{timestamp}.csv"
     fieldnames = data[0].keys() if data and len(data) > 0 else []
     if data and len(data) > 0:
         with open(csv_filename, 'w', newline='', encoding='utf-8') as csvfile:
