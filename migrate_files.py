@@ -61,7 +61,6 @@ for root, dirs, files in os.walk(source_dir):
         file = {
             "path": root_path / filename,
             "name": filename,
-            "file": open(path, 'rb')
         }
         file_dict[opportunity_id].append(file)
 
@@ -131,12 +130,14 @@ def upload_file(file, folder_id, retry):
         "options": '{ "access": "PRIVATE" }',
     }
     try:
-        response = requests.post(url, headers=hs_headers, data=data, files=files)
-        response.raise_for_status()
-        response_json = response.json()
-        log(f"Uploaded file {response_json.get("name")}")
-        hs_files.append(response_json)
-        return response_json.get("id")
+        with open(file["path"], "rb") as f:
+            files = { "file": (file["name"], f) }
+            response = requests.post(url, headers=hs_headers, data=data, files=files)
+            response.raise_for_status()
+            response_json = response.json()
+            log(f"Uploaded file {response_json.get("name")}")
+            hs_files.append(response_json)
+            return response_json.get("id")
     except requests.exceptions.RequestException as e:
         if e.response is not None and (e.response.status_code == 429 or str(e.response.status_code)[0] == "5") and retry < 5:
             retry = retry + 1
